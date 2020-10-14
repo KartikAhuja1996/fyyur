@@ -19,9 +19,11 @@ class Venue(db.Model):
     genres = db.Column(db.String(),nullable=True)
     shows = db.relationship("Show",backref='venue')
     seeking_talent = db.Column(db.Boolean(),nullable=True)
-    seeking_description = db.Column(db.Boolean(),nullable = True)
+    seeking_description = db.Column(db.String(500),nullable = True)
 
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
+    def __repr__(self):
+        return f'<Venue {self.seeking_talent} {self.seeking_description} >'
+
 
 class Artist(db.Model):
     __tablename__ = 'artists'
@@ -36,9 +38,6 @@ class Artist(db.Model):
     facebook_link = db.Column(db.String(120))
     shows = db.relationship("Show",backref='artist')
 
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
-
-# TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
 
 
 class Show(db.Model):

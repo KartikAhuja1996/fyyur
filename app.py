@@ -184,7 +184,7 @@ def show_venue(venue_id):
     'facebook_link':venue.facebook_link,
     'image_link':venue.image_link,
     'seeking_talent':venue.seeking_talent,
-    'seeking_description':'',
+    'seeking_description':venue.seeking_description,
     'past_shows':past_shows,
     'past_shows_count':len(past_shows),
     'upcoming_shows':upcoming_shows,
@@ -217,11 +217,13 @@ def create_venue_submission():
       address = form.address.data,
       phone = form.phone.data,
       facebook_link = form.facebook_link.data,
+      seeking_talent = form.seeking_talent.data,
+      seeking_description = form.seeking_description.data,
       image_link = form.image_link.data,
       website_link = form.website_link.data,
       genres = ",".join(map(str,form.genres.data)) 
     )
-
+    print(venue)
     try:
       db.session.add(venue)
       db.session.commit()
@@ -434,11 +436,20 @@ def edit_venue(venue_id):
   
 
   form = VenueForm(
+    id = venue.id,
     name = venue.name,
+    genres = venue.genres.split(","),
     state = venue.state,
     city = venue.city,
     phone = venue.phone,
-    address= venue.address)
+    address= venue.address,
+    website_link = venue.website_link,
+    facebook_link  = venue.facebook_link,
+    seeking_talent = venue.seeking_talent,
+    seeking_description = venue.seeking_description,
+    image_link = venue.image_link
+    
+    )
   # venue={
   #   "id": 1,
   #   "name": "The Musical Hop",

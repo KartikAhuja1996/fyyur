@@ -1,6 +1,6 @@
 from datetime import datetime
 from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField
+from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField,BooleanField,TextAreaField,validators
 from wtforms.validators import DataRequired, AnyOf, URL,Length,ValidationError
 
 from models import Artist,Venue
@@ -89,6 +89,8 @@ class VenueForm(FlaskForm):
             ('WY', 'WY'),
         ]
     )
+    seeking_talent = BooleanField('seeking_talent')
+    seeking_description = TextAreaField('seeking_description',validators =[validators.optional()] )
     address = StringField(
         'address', validators=[DataRequired()]
     )
