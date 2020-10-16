@@ -43,12 +43,11 @@ migrate = Migrate(app,db)
 #----------------------------------------------------------------------------#
 
 def format_datetime(value, format='medium'):
-  date = dateutil.parser.parse(value)
   if format == 'full':
-      format="EEEE MMMM, d, y 'at' h:mma"
+      format='%A %B, %d, %Y %I-%M %p'
   elif format == 'medium':
-      format="EE MM, dd, y h:mma"
-  return babel.dates.format_datetime(date, format)
+      format="%a %b, %d, %Y %I:%m %p"
+  return value.strftime(format)
 
 app.jinja_env.filters['datetime'] = format_datetime
 
@@ -58,7 +57,15 @@ app.jinja_env.filters['datetime'] = format_datetime
 
 @app.route('/')
 def index():
-  return render_template('pages/home.html')
+  artists = Artist.query.order_by(Artist.id.desc()).limit(10).all()
+  venues = Venue.query.order_by(Venue.id.desc()).limit(10).all()
+
+  return render_template('pages/home.html',data={
+    'artists':artists,
+    'artists_count':len(artists),
+    'venues':venues,
+    'venues_count':len(venues)
+  })
 
 
 #  Venues
@@ -70,7 +77,7 @@ def venues():
   grouped_venues =  db.session.query(Venue.state).group_by(Venue.state).all()
 
   #initialize data variable
-  data = []
+  areas = []
 
   #populating the data variables
   for venue in grouped_venues:
@@ -88,10 +95,13 @@ def venues():
       'upcoming_shows':upcoming_shows,
       'upcoming_shows_count':len(upcoming_shows)
     }
-    data.append(city)
+    areas.append(city)
 
   
-  
+  data = {
+    "count":len(Venue.query.all()),
+    "areas":areas
+  }  
 
   # TODO: replace with real venues data.
   #       num_shows should be aggregated based on number of upcoming shows per venue.
@@ -117,7 +127,7 @@ def venues():
   #   }]
   # }]
   # data = Venue.query.all()
-  return render_template('pages/venues.html', areas=data)
+  return render_template('pages/venues.html', data=data)
 
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
@@ -236,7 +246,7 @@ def create_venue_submission():
       flash('Venue ' + request.form['name'] + ' not listed!')
     else:
       flash('Venue ' + request.form['name'] + ' successfully listed!')
-    return render_template('pages/home.html')
+    return redirect(url_for('venues'))
   else:
     return render_template("forms/new_venue.html",form=form)
   
@@ -265,9 +275,14 @@ def artists():
 
   artists = Artist.query.all()
 
-  data = artists
+  artists_count = len(artists)
 
-  return render_template('pages/artists.html', artists=data)
+  data = {
+    "count":artists_count,
+    "artists":artists
+  }
+
+  return render_template('pages/artists.html', data=data)
 
 @app.route('/artists/search', methods=['POST'])
 def search_artists():
@@ -450,38 +465,37 @@ def edit_venue(venue_id):
     image_link = venue.image_link
     
     )
-  # venue={
-  #   "id": 1,
-  #   "name": "The Musical Hop",
-  #   "genres": ["Jazz", "Reggae", "Swing", "Classical", "Folk"],
-  #   "address": "1015 Folsom Street",
-  #   "city": "San Francisco",
-  #   "state": "CA",
-  #   "phone": "123-123-1234",
-  #   "website": "https://www.themusicalhop.com",
-  #   "facebook_link": "https://www.facebook.com/TheMusicalHop",
-  #   "seeking_talent": True,
-  #   "seeking_description": "We are on the lookout for a local artist to play every two weeks. Please call us.",
-  #   "image_link": "https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60"
-  # }
-  # TODO: populate form with values from venue with ID <venue_id>
+ 
   return render_template('forms/edit_venue.html', form=form, venue=venue)
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
-  # TODO: take values from the form submitted, and update existing
-  # venue record with ID <venue_id> using the new attributes
+  
+  error = False
   venue = Venue.query.get(venue_id)
   if venue is None:
     return render_template("errors/404.html")
   
-  form = VenueForm(request.form)
+
+  form = VenueForm(request.form,obj=venue)
   if(form.validate()):
-    print("Form Validated")
+    form.populate_obj(venue)
+    venue.genres = ",".join(map(str,form.genres.data))
   else:
-    return render_template(url_for('edit_venue_submission',venue_id=venue_id,form=form))
+    return render_template("forms/edit_venue.html",venue=venue,form=form)
 
+  try:
+    db.session.commit()
+  except:
+    db.session.rollback()
+    error = True
+  finally:
+    db.session.close()
 
+  if(error):
+      flash("Unable to update the venue")
+  else:
+      flash("Venue update Successfully ")
 
   return redirect(url_for('show_venue', venue_id=venue_id))
 
@@ -526,7 +540,7 @@ def create_artist_submission():
   else:
     return render_template("forms/new_artist.html",form=form)
 
-  return render_template('pages/home.html')
+  return redirect(url_for("index"))
   # on successful db insert, flash success
   
   # TODO: on unsuccessful db insert, flash an error instead.
@@ -557,7 +571,7 @@ def shows():
       'artist_id':show.artist.id,
       'artist_name':show.artist.name,
       'artist_image_link':show.artist.image_link,
-      'start_name':show.start_time.strftime('%Y-%m-%d %H:%M:%S')
+      'start_time':show.start_time
     }
     data.append(d)  
 
@@ -594,7 +608,7 @@ def create_show_submission():
       flash('An Error Occurred ! Unable to add Show')
     else:
       flash('Show was successfully listed!')  
-    return render_template('pages/home.html')  
+    return redirect(url_for('index'))  
 
   else:
     return render_template('forms/new_show.html',form=form)

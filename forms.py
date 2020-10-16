@@ -26,6 +26,7 @@ class ShowForm(FlaskForm):
         if(Venue.query.get(int(field.data)) is None):
             raise ValidationError("Venue does not exists")
 
+
 class VenueForm(FlaskForm):
     name = StringField(
         'name', validators=[DataRequired()]

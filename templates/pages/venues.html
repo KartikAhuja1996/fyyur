@@ -1,7 +1,15 @@
 {% extends 'layouts/main.html' %}
 {% block title %}Fyyur | Venues{% endblock %}
 {% block content %}
-{% for area in areas %}
+
+
+{% if data.count == 0 %}
+
+<h2>Opps! No Venue is in the database try creating new Venue <a href="{{url_for('index')}}">Create New</a></h2>
+
+{% endif %}
+
+{% for area in data.areas %}
 <h3>{{ area.city }}, {{ area.state }}</h3>
 
 	<a href="/venues/{{area.id}}"> <h5>{{ area.name }}</h5></a>

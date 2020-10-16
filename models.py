@@ -17,7 +17,7 @@ class Venue(db.Model):
     website_link = db.Column(db.String(250),nullable=True)
     facebook_link = db.Column(db.String(120))
     genres = db.Column(db.String(),nullable=True)
-    shows = db.relationship("Show",backref='venue')
+    shows = db.relationship("Show",backref='venue',cascade = "all,delete")
     seeking_talent = db.Column(db.Boolean(),nullable=True)
     seeking_description = db.Column(db.String(500),nullable = True)
 
@@ -36,7 +36,7 @@ class Artist(db.Model):
     website_link = db.Column(db.String(120),nullable=True)
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
-    shows = db.relationship("Show",backref='artist')
+    shows = db.relationship("Show",backref='artist',cascade="all,delete")
 
 
 
@@ -47,3 +47,14 @@ class Show(db.Model):
   venue_id = db.Column(db.Integer,db.ForeignKey('venues.id'))
   artist_id = db.Column(db.Integer,db.ForeignKey('artists.id'))
 
+# class Album(db.Model):
+#     id = db.Column(db.Integer,primary_key=True)
+#     name = db.Column(db.String(100))
+#     created_at = db.Column(db.DateTime)
+#     artist_id = db.Column(db.Integer,db.ForeignKey('artists.id'))
+#     songs = db.relationship("Song",backref='album')
+
+
+# class Song(db.Model):
+#     id = db.Column(db.Integer,primary_key = True)
+#     name = db.Column(db.String(200))

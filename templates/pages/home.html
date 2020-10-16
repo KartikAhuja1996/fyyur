@@ -22,4 +22,38 @@
 		<img id="front-splash" src="{{ url_for('static',filename='img/front-splash.jpg') }}" alt="Front Photo of Musical Band" />
 	</div>
 </div>
+
+<div class="row">
+	{%if data.artists_count > 0 %}
+	<div class="container">
+		<h2 style="margin-bottom: 25px !important;">Recently Added Artists</h2>
+		<div class="artists_container">
+			{% for artist in data.artists %}
+			<div class="artist" style="display: inline-block; margin:0px 10px">
+				<div style="width: 150px;height: 150px; overflow: hidden; display: flex; border-radius: 50%;">
+					<img src="{{artist.image_link}}" style="align-self: center;"/>
+				</div>
+				<a href="/artists/{{artist.id}}" style="text-align: center"><p style="margin-top: 10px !important;">{{artist.name}}</p></a>
+			</div>
+			{% endfor %}
+		</div>
+	</div>
+	{% endif %}
+
+	{% if data.venues_count > 0 %}
+	<div class="container">
+		<h2 style="margin-bottom: 25		px !important;">Recently Added Venues</h2>
+		{% for venue in data.venues %}
+		<div style="display: inline-block; margin:0px 10px">
+		<div style="width: 150px;height: 150px; overflow: hidden; display: flex; border-radius: 10px;">
+			<img src="{{venue.image_link}}"/>
+		</div>
+		<a href="/venues/{{venue.id}}" style="text-align:center">
+			<p>{{venue.name}}</p>
+		</a>
+		</div>
+		{% endfor %}
+	</div>
+	{% endif %}
+</div>
 {% endblock %}

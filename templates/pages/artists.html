@@ -1,8 +1,16 @@
 {% extends 'layouts/main.html' %}
 {% block title %}Fyyur | Artists{% endblock %}
 {% block content %}
+
+
+{% if data.count == 0 %}
+
+<h2>Opps! No Artists is in the database try creating new artist <a href="{{url_for('index')}}">Create New</a></h2>
+
+{% endif %}
+
 <ul class="items">
-	{% for artist in artists %}
+	{% for artist in data.artists %}
 	<li>
 		<a href="/artists/{{ artist.id }}">
 			<i class="fas fa-users"></i>
