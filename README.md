@@ -57,6 +57,7 @@ npm install bootstrap@3
                     "python app.py" to run after installing dependences
   ├── config.py *** Database URLs, CSRF generation, etc
   ├── error.log
+  ├── models.py *** this contains all the models
   ├── forms.py *** Your forms
   ├── requirements.txt *** The dependencies we need to install with "pip3 install -r requirements.txt"
   ├── static
@@ -73,7 +74,6 @@ npm install bootstrap@3
   ```
 
 Overall:
-* Models are located in the `MODELS` section of `app.py`.
 * Controllers are also located in `app.py`.
 * The web frontend is located in `templates/`, which builds static assets deployed to the web server at `static/`.
 * Web forms for creating data are located in `form.py`
@@ -84,7 +84,7 @@ Highlight folders:
 * `templates/layouts` -- (Already complete.) Defines the layout that a page can be contained in to define footer and header code for a given page.
 * `templates/forms` -- (Already complete.) Defines the forms used to create new artists, shows, and venues.
 * `app.py` -- (Missing functionality.) Defines routes that match the user’s URL, and controllers which handle data and renders views to the user. This is the main file you will be working on to connect to and manipulate the database and render views with data to the user, based on the URL.
-* Models in `app.py` -- (Missing functionality.) Defines the data models that set up the database tables.
+* Models in `models.py` -- (Missing functionality.) Defines the data models that set up the database tables.
 * `config.py` -- (Missing functionality.) Stores configuration variables and instructions, separate from the main application code. This is where you will need to connect to the database.
 
 
@@ -113,7 +113,7 @@ pip install -r requirements.txt
 ```
 export FLASK_APP=myapp
 export FLASK_ENV=development # enables debug mode
-python3 app.py
+flask run
 ```
 
 4. **Verify on the Browser**<br>
